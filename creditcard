@@ -1,0 +1,128 @@
+#include <cs50.h>
+#include <math.h>
+#include <stdio.h>
+
+long get_cardnr();           // Ask for a credit card number
+int get_lenght(long n);      // Find the lenght of the number of digits and starting digits
+int get_digits(long n);      // Check starting digits
+bool checksum(long number);  // Check Luhn’s Algorithm if is valid or not
+bool type_card(long number); // Check credit card type
+
+int main(void)
+{
+    long card_number = get_cardnr();
+    type_card(card_number);
+}
+
+// Ask for a credit card number, accept only if is positive
+
+long get_cardnr()
+{
+    long n;
+    do
+    {
+        n = get_long("Credit card number: ");
+    }
+    while (n <= 0);
+
+    return n;
+}
+
+// Calculate the lenght of the credit card digits
+
+int get_lenght(long n)
+{
+    int number = n;
+    int count = 0;
+    while (n > 0)
+    {
+        count++;
+        n = n / 10;
+    }
+    return count;
+}
+
+// Check starting digits
+
+int get_digits(long n)
+{
+    int lengh = get_lenght(n);
+    int start_dig = n / (pow(10, (lengh - 2)));
+    return start_dig;
+}
+
+// Ceck Luhn’s Algorithm
+
+bool checksum(long number)
+{
+    int sum = 0;
+    long i = 1;
+    long j = 10;
+    long cont1 = number;
+    long cont2 = number / 10;
+
+    while (i < number)
+    {
+        int x;
+        x = cont1 % 10;
+        sum = sum + x;
+        i = i * 100;
+        cont1 = number / (i);
+    }
+
+    while (j < number)
+    {
+
+        int z = 0;
+        int y = cont2 % 10;
+        z = 2 * y;
+        if (z > 10)
+        {
+            int c = z % 10;
+            int v = z / 10;
+            sum = sum + c + v;
+        }
+        else
+        {
+            sum = sum + z;
+        }
+
+        j = j * 100;
+        cont2 = number / (j);
+    }
+
+    int check = sum % 10;
+
+    if (check == 0)
+    {
+        printf("Valid credit card number\n");
+        return true;
+    }
+    else
+    {
+        printf("Invalid credit card number\n");
+        return false;
+    }
+}
+
+// Check credit card type
+
+bool type_card(long number)
+{
+    int lenght = get_lenght(number);
+    int digits = get_digits(number);
+    bool x = checksum(number);
+    if (x == true)
+    {
+        if (lenght == 13 || lenght == 16)
+            if (digits >= 40 && digits < 50)
+                printf("The type of the card is Visa\n");
+        if (lenght == 16)
+            if (digits > 50 && digits < 56)
+                printf("The type of the card is Mastercard\n");
+        if (lenght == 15)
+            if (digits == 34 || digits == 37)
+                printf("The type of the card is American Express\n");
+    }
+    return true;
+}
